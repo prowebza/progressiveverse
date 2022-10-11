@@ -1,7 +1,7 @@
 /*
   This Behavior for Actor creates a rigid body and a collider based on
-  rapierShape, rapierForce, and raperType properties, and add it to
-  the rapier-based simulation.
+  physicsShape, physicsForce, and physicsType properties, and add it to
+  the Rapier engine based physics simulation.
 
   For information on Rapier, refer to this page:
   https://rapier.rs/docs/user_guides/javascript/getting_started_js
@@ -14,7 +14,7 @@ class CascadeBoxActor {
         if (!this.physicsWorld) {
             let physicsManager = this.service("PhysicsManager");
             console.log("new physics world for cascade");
-            this.setPhysicsWorld(physicsManager.createWorld({timeStep: 15}, this.id));
+            this.setPhysicsWorld(physicsManager.createWorld({timeStep: 20}, this.id));
         }
 
         this.removeObjects();
@@ -25,10 +25,10 @@ class CascadeBoxActor {
             layers: ["pointer"],
             behaviorModules: ["Physics", "Cascade"],
             rotation: [0.4, 0, 0],
-            rapierSize: [5, 0.3, 3.5],
+            physicsSize: [5, 0.3, 3.5],
             color: 0x997777,
-            rapierShape: "cuboid",
-            rapierType: "positionBased",
+            physicsShape: "cuboid",
+            physicsType: "positionBased",
             shadow: true,
             parent: this,
         });
@@ -40,10 +40,10 @@ class CascadeBoxActor {
             behaviorModules: ["Physics", "Cascade"],
             translation: [0, -1.6, 3.8],
             rotation: [0.28, 0, 0],
-            rapierSize: [5, 0.3, 3.5],
+            physicsSize: [5, 0.3, 3.5],
             color: 0x997777,
-            rapierShape: "cuboid",
-            rapierType: "positionBased",
+            physicsShape: "cuboid",
+            physicsType: "positionBased",
             shadow: true,
             parent: this,
         });
@@ -81,22 +81,22 @@ class CascadeBoxActor {
 class CascadeActor {
     setup() {
         /*
-          variable kinematic is initialized based on rapierType and
-          calls another behavior (Rapier)'s createRigidBoy method,
-          which in turn calls Rapier's method of the same name.
+          variable kinematic is initialized based on physicsType and
+          calls another behavior's (Physics) createRigidBoy method,
+          which in turn calls Physics behavior method of the same name.
 
-          Variable Physics contains all exports from the rapier
+          Variable Microverse.Physics contains all exports from the Rapier
           packages. It is prefixed with Microverse, which is the only
           global variable visible to behavior code.
         */
         let kinematic;
-        let rapierType = this._cardData.rapierType;
-        let rapierShape = this._cardData.rapierShape;
-        let rapierSensor = this._cardData.rapierSensor;
-        let rapierForce = this._cardData.rapierForce;
-        if (rapierType === "positionBased") {
+        let physicsType = this._cardData.physicsType;
+        let physicsShape = this._cardData.physicsShape;
+        let physicsSensor = this._cardData.physicsSensor;
+        let physicsForce = this._cardData.physicsForce;
+        if (physicsType === "positionBased") {
             kinematic = Microverse.Physics.RigidBodyDesc.newKinematicPositionBased();
-        } else if (rapierType === "static") {
+        } else if (physicsType === "static") {
             kinematic = Microverse.Physics.RigidBodyDesc.newStatic();
         } else {
             kinematic = Microverse.Physics.RigidBodyDesc.newDynamic();
@@ -104,7 +104,7 @@ class CascadeActor {
         this.call("Physics$PhysicsActor", "createRigidBody", kinematic);
 
         /*
-          variable cd (collider description) is initialized based on rapierShape and rapierSize,
+          variable cd (collider description) is initialized based on physicsShape and physicsSize,
           and it is used for a call to createCollider.
 
           The ColliderDesc of Rapier tends to take the half-size;
@@ -112,17 +112,17 @@ class CascadeActor {
         */
 
         let cd;
-        if (rapierShape === "ball") {
-            let s = this._cardData.rapierSize || 1;
+        if (physicsShape === "ball") {
+            let s = this._cardData.physicsSize || 1;
             s = s / 2;
             cd = Microverse.Physics.ColliderDesc.ball(s);
-        } else if (rapierShape === "cuboid") {
-            let s = this._cardData.rapierSize || [1, 1, 1];
+        } else if (physicsShape === "cuboid") {
+            let s = this._cardData.physicsSize || [1, 1, 1];
             s = [s[0] / 2, s[1] / 2, s[2] / 2];
             cd = Microverse.Physics.ColliderDesc.cuboid(...s);
         }
-        /*else if (rapierShape === "cylinder") {
-            let s = this._cardData.rapierSize || [1, 1];
+        /*else if (physicsShape === "cylinder") {
+            let s = this._cardData.physicsSize || [1, 1];
             s = [s[1] / 2, s[0]];
             cd = Microverse.Physics.ColliderDesc.cylinder(...s);
         }*/
@@ -131,18 +131,18 @@ class CascadeActor {
           Uncomment above shape === "cylinder" section to add cylinder type.
         */
 
-        cd.setRestitution(this._cardData.rapierRestitution || 0.4);
-        cd.setFriction(this._cardData.rapierFriction || 0.8);
-        cd.setDensity(this._cardData.rapierDensity || 1.5);
+        cd.setRestitution(this._cardData.physicsRestitution || 0.4);
+        cd.setFriction(this._cardData.physicsFriction || 0.8);
+        cd.setDensity(this._cardData.physicsDensity || 1.5);
 
         /*
-          rapierSensor here adds intersectionEventHandler. Note that
+          physicsSensor here adds intersectionEventHandler. Note that
           this code (cascade.js) is in the user land; if you need to
           have contactEventHandler for your application, you can
           simply add it here.
         */
 
-        if (rapierSensor) {
+        if (physicsSensor) {
             this.registerCollisionEventHandler("intersection");
             cd.setSensor(true);
             cd.setActiveEvents(Microverse.Physics.ActiveEvents.CONTACT_EVENTS |
@@ -156,16 +156,19 @@ class CascadeActor {
            the jolt method.
         */
 
-        if (!rapierType) {
+        if (!physicsType) {
             this.addEventListener("pointerTap", "jolt");
         }
 
         /*
-          If the card spec has an initial rapierForce, put some force upon creation.
+          If the card spec has an initial physicsForce, put some force upon creation.
         */
 
-        if (rapierForce) {
-            this.rigidBody.applyImpulse(rapierForce);
+        if (physicsForce) {
+            if (!this.initialImpulseApplied) {
+                this.initialImpulseApplied = true;
+                this.rigidBody.applyImpulse(physicsForce);
+            }
         }
 
         /*
@@ -188,8 +191,8 @@ class CascadeActor {
     translated() {
         /*
           if this object fell below, it kills itself.
-          destroy() is a method of the base CardActor. It invokes all destroy() methods of attached
-          behaviors. The Rapier behavior removes the rigidBody from the Rapier world.
+          destroy() is a method of the base CardActor. It invokes all teardown() methods of attached
+          behaviors. The Physics behavior removes the rigidBody from the Rapier world.
         */
         if (this._translation[1] < -10) {
             this.destroy();
@@ -200,7 +203,7 @@ class CascadeActor {
         /*
           The CardActor has a method that invokes a behavior's method based on
           `intersectionEventHandlerBehavior` and `intersectionEventHandlerMethod` values.
-          In this example, this is called from the above 'rapierSensor' case.
+          In this example, this is called from the above 'physicsSensor' case.
         */
         let behavior = this._behavior;
         let physicsWorld = this.physicsWorld();
@@ -229,7 +232,7 @@ class CascadeActor {
 class CascadePawn {
     setup() {
         /*
-          Creates a Three.JS mesh based on the specified rapierShape and rapierSize.
+          Creates a Three.JS mesh based on the specified physicsShape and physicsSize.
 
           For a demo purpose, it does not override an existing shape
           (by checking this.shape.children.length) so that the earth
@@ -242,24 +245,24 @@ class CascadePawn {
         // [...this.shape.children].forEach((c) => this.shape.remove(c));
 
         if (this.shape.children.length === 0) {
-            let rapierShape = this.actor._cardData.rapierShape;
-            if (rapierShape === "ball") {
-                let s = this.actor._cardData.rapierSize || 1;
+            let physicsShape = this.actor._cardData.physicsShape;
+            if (physicsShape === "ball") {
+                let s = this.actor._cardData.physicsSize || 1;
                 let geometry = new Microverse.THREE.SphereGeometry(s / 2, 32, 16);
                 let material = new Microverse.THREE.MeshStandardMaterial({color: this.actor._cardData.color || 0xff0000});
                 this.obj = new Microverse.THREE.Mesh(geometry, material);
                 this.obj.castShadow = this.actor._cardData.shadow;
                 this.obj.receiveShadow = this.actor._cardData.shadow;
-            } else if (rapierShape === "cuboid") {
-                let s = this.actor._cardData.rapierSize || [1, 1, 1];
+            } else if (physicsShape === "cuboid") {
+                let s = this.actor._cardData.physicsSize || [1, 1, 1];
                 let geometry = new Microverse.THREE.BoxGeometry(...s);
                 let material = new Microverse.THREE.MeshStandardMaterial({color: this.actor._cardData.color || 0xff0000});
                 this.obj = new Microverse.THREE.Mesh(geometry, material);
                 this.obj.castShadow = this.actor._cardData.shadow;
                 this.obj.receiveShadow = this.actor._cardData.shadow;
             }
-            /*else if (rapierShape === "cylinder") {
-                let s = this.actor._cardData.rapierSize || [1, 1];
+            /*else if (physicsShape === "cylinder") {
+                let s = this.actor._cardData.physicsSize || [1, 1];
                 let geometry = new Microverse.THREE.CylinderGeometry(s[0], s[0], s[1], 20);
                 let material = new Microverse.THREE.MeshStandardMaterial({color: this.actor._cardData.color || 0xff0000});
                 this.obj = new Microverse.THREE.Mesh(geometry, material);
@@ -333,8 +336,8 @@ class SprayActor {
         const bt = [t[0], t[1] - 0.2, t[2]]; // bt for base translation
 
         let r = Math.random() * Math.PI * 2;
-        let x = Math.cos(r) * 0.04;
-        let z = Math.sin(r) * 0.04;
+        let x = Math.cos(r) * 0.04 - 0.02;
+        let z = Math.sin(r) * 0.04 - 0.02;
         let shape;
         let size;
         let density;
@@ -352,9 +355,9 @@ class SprayActor {
                 layers: ["pointer"],
                 scale: [0.1, 0.1, 0.1],
                 behaviorModules: ["Physics", "Earth", "Cascade"],
-                rapierSize: 0.8,
-                rapierShape: "ball",
-                rapierForce: {x, y: 0, z},
+                physicsSize: 0.8,
+                physicsShape: "ball",
+                physicsForce: {x, y: 0, z},
                 density: 2,
                 parent: this.parent,
                 shadow: true,
@@ -386,10 +389,10 @@ class SprayActor {
             layers: ["pointer"],
             translation: bt,
             behaviorModules: ["Physics", "Cascade"],
-            rapierSize: size,
-            rapierForce: {x, y: 0, z},
-            rapierShape: shape,
-            rapierDensity: density,
+            physicsSize: size,
+            physicsForce: {x, y: 0, z},
+            physicsShape: shape,
+            physicsDensity: density,
             color: color,
             parent: this.parent,
             shadow: true,

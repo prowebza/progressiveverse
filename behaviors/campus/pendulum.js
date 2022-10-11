@@ -139,8 +139,6 @@ class PendulumLinkActor {
 class PendulumLinkPawn {
     setup() {
         /*
-          Creates a Three.JS mesh based on the specified rapierShape and rapierSize.
-
           For a demo purpose, it does not override an existing shape
           (by checking this.shape.children.length) so that the earth
           shape created by FlightTracker behavior is preserved.

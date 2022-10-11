@@ -128,7 +128,7 @@ export function init(Constants) {
                 type: "object",
                 translation: [71.17293618667556, 8.245323976153406, -106.57786383978849],
                 // translation: [68, 9.3, -102],
-                behaviorModules: ["Physics", "Pendulum"],
+                behaviorModules: ["Pendulum"],
                 layers: ["pointer"],
                 scale: [0.2, 0.2, 0.2],
                 color: 0xaa6666,

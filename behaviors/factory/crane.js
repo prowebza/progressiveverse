@@ -8,7 +8,7 @@
     below to help assist you in changing these values. Also, the code is somewhat
     modified for two connections, so see previous commits for the one connection code.
     
-    (cd = Microverse.RAPIER.ColliderDesc.ball(0.85))
+    (cd = Microverse.Physics.ColliderDesc.ball(0.85))
     (let translation = [0, 34.135389925172704 - i * 2, 0])
     (card.call("Physics$PhysicsActor", "createImpulseJoint", "ball" ...))
     (let s = [0.1, 2.3])
@@ -215,7 +215,7 @@ class CraneLinkPawn {
 
         /*
 
-          Creates a Three.JS mesh based on the specified rapierShape and rapierSize.
+          Creates a Three.JS mesh based on the specified physicsShape and physicsSize.
           
           For a demo purpose, it does not override an existing shape
           (by checking this.shape.children.length) so that the earth

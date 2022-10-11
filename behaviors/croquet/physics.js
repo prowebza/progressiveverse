@@ -107,7 +107,7 @@ class PhysicsActor {
         const physicsWorld = this.physicsWorld;
         if (!physicsWorld) {return;}
         this._myPhysicsWorld = physicsWorld;
-        // some compatibility with Rapier 0.7.3
+        // compatibility with Rapier 0.7.3 based spec
         if (type === "ball") {type = "spherical";}
 
         let func = Microverse.Physics.JointData[type];
