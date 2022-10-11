@@ -1,7 +1,7 @@
 /*
   This Behavior for Actor creates a rigid body and a collider based on
-  physicsShape, physicsForce, and rapierType properties, and add it to
-  the Rapier engine based Physics simulation.
+  physicsShape, physicsForce, and physicsType properties, and add it to
+  the Rapier engine based physics simulation.
 
   For information on Rapier, refer to this page:
   https://rapier.rs/docs/user_guides/javascript/getting_started_js
@@ -63,7 +63,9 @@ class CascadeBoxActor {
     }
 
     removeObjects() {
-        this.children.forEach((c) => c.destroy());
+        if (this.children) {
+            [...this.children].forEach((c) => c.destroy());
+        }
     }
 
     removePhysics() {

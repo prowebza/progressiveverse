@@ -17,8 +17,6 @@ class CascadeBoxActor {
             this.setPhysicsWorld(physicsManager.createWorld({timeStep: 20}, this.id));
         }
 
-        let baseSize = [5, 0.3, 5];
-
         this.removeObjects();
 
         this.base1 = this.createCard({
@@ -27,7 +25,7 @@ class CascadeBoxActor {
             layers: ["pointer"],
             behaviorModules: ["Physics", "Cascade"],
             rotation: [0.4, 0, 0],
-            physicsSize: baseSize,
+            physicsSize: [5, 0.3, 3.5],
             color: 0x997777,
             physicsShape: "cuboid",
             physicsType: "positionBased",
@@ -40,9 +38,9 @@ class CascadeBoxActor {
             type: "object",
             layers: ["pointer"],
             behaviorModules: ["Physics", "Cascade"],
-            translation: [0, -1.9, 5],
-            rotation: [0.2, 0, 0],
-            physicsSize: baseSize,
+            translation: [0, -1.6, 3.8],
+            rotation: [0.28, 0, 0],
+            physicsSize: [5, 0.3, 3.5],
             color: 0x997777,
             physicsShape: "cuboid",
             physicsType: "positionBased",
@@ -87,7 +85,7 @@ class CascadeActor {
           calls another behavior's (Physics) createRigidBoy method,
           which in turn calls Physics behavior method of the same name.
 
-          Variable Physics contains all exports from the physics
+          Variable Microverse.Physics contains all exports from the Rapier
           packages. It is prefixed with Microverse, which is the only
           global variable visible to behavior code.
         */

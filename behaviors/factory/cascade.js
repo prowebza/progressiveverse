@@ -336,8 +336,8 @@ class SprayActor {
         const bt = [t[0], t[1] - 0.2, t[2]]; // bt for base translation
 
         let r = Math.random() * Math.PI * 2;
-        let x = Math.cos(r) * 0.04 - 0.02;
-        let z = Math.sin(r) * 0.04 - 0.02;
+        let x = Math.cos(r) * 0.02 - 0.01;
+        let z = Math.sin(r) * 0.02 - 0.01;
         let shape;
         let size;
         let density;
