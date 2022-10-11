@@ -341,8 +341,8 @@ class SprayActor {
         const bt = [t[0], t[1] - 0.2, t[2]]; // bt for base translation
 
         let r = Math.random() * Math.PI * 2;
-        let x = Math.cos(r) * 0.02 - 0.01;
-        let z = Math.sin(r) * 0.02 - 0.01;
+        let x = Math.cos(r) * 0.02;
+        let z = Math.sin(r) * 0.02;
         let shape;
         let size;
         let density;
@@ -350,6 +350,8 @@ class SprayActor {
         let dice = Math.random();
 
         if (dice < 0.01) {
+            x *= 20;
+            z *= 20;
             this.createCard({
                 name:"earth",
                 type: "object",
@@ -383,9 +385,9 @@ class SprayActor {
         } else {
             shape = "ball";
             size = 0.4;
-            density = 1.5;
-            x *= 2;
-            z *= 2;
+            density = 4;
+            x *= 10;
+            z *= 10;
         }
 
         this.createCard({
