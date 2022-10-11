@@ -10,7 +10,7 @@ export function init(Constants) {
     Constants.UserBehaviorDirectory = "behaviors/default";
     Constants.UserBehaviorModules = [
         "demo.js", "flightTracker.js", "spin.js", "lights.js",
-        "slides.js", "cascade.js"
+        "slides.js", "cascade.js", "earth.js"
     ];
 
     const frameColor = 0x888888;
@@ -123,13 +123,12 @@ export function init(Constants) {
         },
         {
             card: {
-                name:"base",
+                name:"cascade box",
                 type: "object",
-                layers: ["pointer", "walk"],
-                translation: [-20, 1, 64],
+                layers: ["pointer"],
+                translation: [-20, 0.5, 64],
                 rotation: [0, Math.PI, 0],
                 behaviorModules: ["CascadeBox"],
-                shadow: true,
             }
         },
     ];

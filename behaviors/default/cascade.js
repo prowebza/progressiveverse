@@ -17,17 +17,15 @@ class CascadeBoxActor {
             this.setPhysicsWorld(physicsManager.createWorld({timeStep: 20}, this.id));
         }
 
-        let baseSize = [5, 0.3, 5];
-
-        if (this.spray) {return;}
+        this.removeObjects();
 
         this.base1 = this.createCard({
             name:"base",
             type: "object",
-            layers: ["pointer"],
+            layers: ["pointer", "walk"],
             behaviorModules: ["Physics", "Cascade"],
-            rotation: [0.4, 0, 0],
-            physicsSize: baseSize,
+            rotation: [0.5, 0, 0],
+            physicsSize: [5, 0.3, 3.5],
             color: 0x997777,
             physicsShape: "cuboid",
             physicsType: "positionBased",
@@ -38,11 +36,11 @@ class CascadeBoxActor {
         this.base2 = this.createCard({
             name:"base 2",
             type: "object",
-            layers: ["pointer"],
+            layers: ["pointer", "walk"],
             behaviorModules: ["Physics", "Cascade"],
-            translation: [0, -1.9, 5.6],
-            rotation: [0.2, 0, 0],
-            physicsSize: baseSize,
+            translation: [0, -1.65, 3.8],
+            rotation: [0.28, 0, 0],
+            physicsSize: [5, 0.3, 3.5],
             color: 0x997777,
             physicsShape: "cuboid",
             physicsType: "positionBased",
@@ -69,8 +67,8 @@ class CascadeBoxActor {
     }
 
     removePhysics() {
-        if (this.physics) {
-            this.physics.destroy();
+        if (this.physicsWorld) {
+            this.physicsWorld.destroy();
         }
     }
 
@@ -84,10 +82,10 @@ class CascadeActor {
     setup() {
         /*
           variable kinematic is initialized based on physicsType and
-          calls another behavior (Physics)'s createRigidBoy method,
-          which in turn calls Physics's method of the same name.
+          calls another behavior's (Physics) createRigidBoy method,
+          which in turn calls Physics behavior method of the same name.
 
-          Variable Physics contains all exports from the physics
+          Variable Microverse.Physics contains all exports from the Rapier
           packages. It is prefixed with Microverse, which is the only
           global variable visible to behavior code.
         */
@@ -193,8 +191,8 @@ class CascadeActor {
     translated() {
         /*
           if this object fell below, it kills itself.
-          destroy() is a method of the base CardActor. It invokes all destroy() methods of attached
-          behaviors. The Physics behavior removes the rigidBody from the Physics world.
+          destroy() is a method of the base CardActor. It invokes all teardown() methods of attached
+          behaviors. The Physics behavior removes the rigidBody from the Rapier world.
         */
         if (this._translation[1] < -10) {
             this.destroy();
@@ -238,7 +236,7 @@ class CascadePawn {
 
           For a demo purpose, it does not override an existing shape
           (by checking this.shape.children.length) so that the earth
-          shape created by FlightTracker behavior is preserved.
+          shape created by Earth behavior is preserved.
 
           Uncomment the cyclinder case to add the cylinder shape.
 
@@ -273,6 +271,11 @@ class CascadePawn {
             }*/
             this.shape.add(this.obj);
         }
+
+        if (this.actor.layers.includes("walk")) {
+            this.constructCollider(this.obj);
+        }
+
         this.removeEventListener("pointerDoubleDown", "onPointerDoubleDown");
         this.addEventListener("pointerDoubleDown", "nop");
     }
@@ -346,20 +349,17 @@ class SprayActor {
 
         let dice = Math.random();
 
-        if (dice < 0.1) {
-            /*
-              The FlightTracker behavior is used, but without the "Elected" behavior, it does not start fetching the live data. It is used solely to create the Earth appearance.
-            */
+        if (dice < 0.01) {
             this.createCard({
                 name:"earth",
                 type: "object",
                 translation: bt,
                 layers: ["pointer"],
                 scale: [0.1, 0.1, 0.1],
-                behaviorModules: ["Physics", "FlightTracker", "Cascade"],
+                behaviorModules: ["Physics", "Earth", "Cascade"],
                 physicsSize: 0.8,
                 physicsShape: "ball",
-                physicsForce: {x, y: 0, z: z},
+                physicsForce: {x, y: 0, z},
                 density: 2,
                 parent: this.parent,
                 shadow: true,
@@ -384,6 +384,8 @@ class SprayActor {
             shape = "ball";
             size = 0.4;
             density = 1.5;
+            x *= 2;
+            z *= 2;
         }
 
         this.createCard({
